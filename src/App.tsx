@@ -359,7 +359,10 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
       video.style.opacity = '0';
       video.play()
         .then(() => startFade(1, 500))
-        .catch((err) => console.log('Autoplay waiting:', err));
+        .catch((err) => {
+          console.log('Autoplay waiting/blocked:', err);
+          video.style.opacity = '1'; // Ensure it's not a black screen if autoplay fails
+        });
     }
     return () => {
       if (animationFrameRef.current) {
@@ -374,6 +377,7 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover translate-y-[17%] pointer-events-none"
         src="/my_video.mp4"
+        autoPlay
         muted
         playsInline
         onTimeUpdate={handleTimeUpdate}
