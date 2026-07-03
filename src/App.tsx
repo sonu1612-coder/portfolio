@@ -1,7 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Globe, ArrowRight, Mail, Phone } from 'lucide-react';
+import { Globe, ArrowRight, Mail, Phone, Sparkles, Terminal, Cpu, Code, Coffee, Layers } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import profilePic from './assets/profile.png';
+import faceEmotionPic from './assets/face_emotion_detection.png';
+import carbonFootprintPic from './assets/carbon_footprint.png';
+import {
+  getProfile,
+  getServices,
+  getProjects,
+  type ProfileData,
+  type ServiceData,
+  type ProjectData,
+} from './sanity';
 
 // --- INLINE SVGS FOR BRAND ICONS (Lucide v1.x fallback) ---
 const Instagram: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -66,10 +76,10 @@ const Linkedin: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 // --- REUSABLE COMPONENTS ---
 
-// 1. ContactButton Component - Opens mailto to Daksh
-const ContactButton: React.FC = () => (
+// 1. ContactButton Component - Opens mailto
+const ContactButton: React.FC<{ email?: string }> = ({ email = 'dakshchoudhary160@gmail.com' }) => (
   <a
-    href="mailto:dakshchoudhary160@gmail.com"
+    href={`mailto:${email}`}
     style={{
       background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
       boxShadow: '0px 4px 4px rgba(181, 1, 167, 0.25), 4px 4px 12px #7721B1 inset',
@@ -276,7 +286,7 @@ const AnimatedText: React.FC<{ text: string }> = ({ text }) => {
 };
 
 // --- CINEMATIC HERO SECTION (PAGE 1) ---
-const CinematicHero: React.FC = () => {
+const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const fadingOutRef = useRef<boolean>(false);
@@ -318,6 +328,13 @@ const CinematicHero: React.FC = () => {
   const handleEnded = () => {
     const video = videoRef.current;
     if (!video) return;
+    
+    // Swipe down transition (scroll to next section smoothly)
+    window.scrollTo({
+      top: window.innerHeight,
+      behavior: 'smooth'
+    });
+
     video.style.opacity = '0';
     setTimeout(() => {
       video.currentTime = 0;
@@ -327,7 +344,7 @@ const CinematicHero: React.FC = () => {
           startFade(1, 500);
         })
         .catch((err) => console.log('Video error:', err));
-    }, 100);
+    }, 1000);
   };
 
   const handlePlay = () => {
@@ -356,7 +373,7 @@ const CinematicHero: React.FC = () => {
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover translate-y-[17%] pointer-events-none"
-        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_115001_bcdaa3b4-03de-47e7-ad63-ae3e392c32d4.mp4"
+        src="/my_video.mp4"
         muted
         playsInline
         onTimeUpdate={handleTimeUpdate}
@@ -368,7 +385,7 @@ const CinematicHero: React.FC = () => {
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2 text-white font-semibold text-lg">
               <Globe className="w-6 h-6 text-white" />
-              <span>Daksh</span>
+              <span>{profile.name}</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
               {['Features', 'Pricing', 'About'].map((link) => (
@@ -384,7 +401,7 @@ const CinematicHero: React.FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/sonu1612-coder"
+              href={profile.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-white hover:text-white/80 transition-colors text-sm font-medium"
@@ -392,7 +409,7 @@ const CinematicHero: React.FC = () => {
               GitHub
             </a>
             <a
-              href="https://www.linkedin.com/in/daksh-choudhary-a56a6b320/"
+              href={profile.linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="liquid-glass rounded-full px-6 py-2 text-white text-sm font-medium hover:bg-white/5 transition-colors"
@@ -406,7 +423,7 @@ const CinematicHero: React.FC = () => {
         <div className="relative group mb-6">
           <div className="absolute inset-0 rounded-full bg-white/10 blur-md group-hover:bg-white/20 transition-all duration-300 pointer-events-none" />
           <img
-            src={profilePic}
+            src={profile.profilePicture || profilePic}
             alt="User Profile"
             className="relative w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border border-white/20 shadow-2xl transition-transform duration-300 group-hover:scale-105"
           />
@@ -415,7 +432,7 @@ const CinematicHero: React.FC = () => {
           style={{ fontFamily: "'Instrument Serif', serif" }}
           className="text-5xl md:text-6xl lg:text-7xl text-white mb-8 tracking-tight whitespace-nowrap"
         >
-          Built for the curious
+          {profile.heroTitle}
         </h1>
         <div className="max-w-xl w-full space-y-4 flex flex-col items-center">
           <div className="liquid-glass rounded-full pl-6 pr-2 py-2 flex items-center gap-3 w-full">
@@ -438,9 +455,9 @@ const CinematicHero: React.FC = () => {
       </main>
       <footer className="relative z-10 flex justify-center gap-4 pb-12 w-full">
         {[
-          { Icon: Github, label: 'GitHub', href: 'https://github.com/sonu1612-coder' },
-          { Icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/daksh-choudhary-a56a6b320/' },
-          { Icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/daksh.331/' },
+          { Icon: Github, label: 'GitHub', href: profile.githubUrl },
+          { Icon: Linkedin, label: 'LinkedIn', href: profile.linkedinUrl },
+          { Icon: Instagram, label: 'Instagram', href: profile.instagramUrl },
           { Icon: Globe, label: 'Website', href: '#website' },
         ].map(({ Icon, label, href }) => (
           <a
@@ -460,13 +477,13 @@ const CinematicHero: React.FC = () => {
 };
 
 // --- DAKSH'S HERO SECTION ---
-const DakshHero: React.FC = () => {
+const DakshHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   return (
     <section className="relative min-h-screen bg-[#0C0C0C] flex flex-col justify-between overflow-hidden group">
       {/* Navbar */}
       <FadeIn delay={0} y={-20} className="w-full">
         <nav className="flex items-center justify-between px-6 md:px-10 pt-6 md:pt-8 w-full z-30 relative">
-          <span className="text-[#D7E2EA] font-semibold text-lg tracking-wider">DAKSH</span>
+          <span className="text-[#D7E2EA] font-semibold text-lg tracking-wider">{profile.name.toUpperCase()}</span>
           <div className="flex items-center gap-4 sm:gap-6 md:gap-10">
             {['About', 'Services', 'Projects', 'Contact'].map((link) => (
               <a
@@ -485,8 +502,8 @@ const DakshHero: React.FC = () => {
       <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 md:px-10 w-full z-10 relative mt-8 sm:mt-12">
         <div className="overflow-hidden w-full flex justify-center mb-6 sm:mb-10">
           <FadeIn delay={0.15} y={40}>
-            <h1 className="hero-heading font-black uppercase tracking-tight leading-none text-center select-none text-[15vw] sm:text-[12vw] md:text-[11vw] lg:text-[12vw] w-full">
-              Hi, i&apos;m daksh
+            <h1 className="hero-heading font-black uppercase tracking-tight leading-none text-center select-none text-[12vw] sm:text-[10vw] md:text-[9vw] lg:text-[10vw] w-full break-words">
+              Hi, i&apos;m {profile.name.toLowerCase()}
             </h1>
           </FadeIn>
         </div>
@@ -498,8 +515,8 @@ const DakshHero: React.FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
               whileHover={{ scale: 1.05 }}
-              src={profilePic}
-              alt="Daksh Portrait"
+              src={profile.profilePicture || profilePic}
+              alt={`${profile.name} Portrait`}
               className="w-full rounded-2xl border-4 border-[#D7E2EA]/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] object-cover pointer-events-auto select-none cursor-pointer transition-transform duration-300"
             />
           </Magnet>
@@ -510,11 +527,11 @@ const DakshHero: React.FC = () => {
       <div className="w-full px-6 md:px-10 pb-7 sm:pb-8 md:pb-10 pt-10 flex flex-col sm:flex-row items-center sm:items-end justify-between z-30 relative gap-6 sm:gap-0">
         <FadeIn delay={0.35} y={20}>
           <p className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug text-center sm:text-left text-[clamp(0.75rem,1.4vw,1.5rem)] max-w-[280px] sm:max-w-[220px] md:max-w-[320px]">
-            a developer & content creator driven by crafting modern web solutions and passionate about AI
+            {profile.heroDescription}
           </p>
         </FadeIn>
         <FadeIn delay={0.5} y={20}>
-          <ContactButton />
+          <ContactButton email={profile.email} />
         </FadeIn>
       </div>
     </section>
@@ -617,10 +634,7 @@ const MarqueeSection: React.FC = () => {
 };
 
 // 3. AboutSection Component
-const AboutSection: React.FC = () => {
-  const text =
-    "With more than five years of experience in development and content creation, i focus on web applications, AI integration, and sharing coding tutorials. I truly enjoy building systems that leverage artificial intelligence to solve real-world problems. Let's create something incredible together!";
-
+const AboutSection: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   return (
     <section
       id="daksh-about"
@@ -663,9 +677,9 @@ const AboutSection: React.FC = () => {
           </h2>
         </FadeIn>
         <div className="flex flex-col items-center gap-16 sm:gap-20 md:gap-24 w-full">
-          <AnimatedText text={text} />
+          <AnimatedText text={profile.aboutText} />
           <FadeIn delay={0.2} y={20}>
-            <ContactButton />
+            <ContactButton email={profile.email} />
           </FadeIn>
         </div>
       </div>
@@ -674,35 +688,7 @@ const AboutSection: React.FC = () => {
 };
 
 // 4. ServicesSection Component (Personalized for Daksh)
-const ServicesSection: React.FC = () => {
-  const services = [
-    {
-      num: '01',
-      name: 'Web Development',
-      desc: 'Building responsive, modern, and high-performance web applications using React, TypeScript, and Tailwind CSS.',
-    },
-    {
-      num: '02',
-      name: 'AI Integration',
-      desc: 'Leveraging large language models and AI APIs to build intelligent agents, chatbots, and automation workflows.',
-    },
-    {
-      num: '03',
-      name: 'Content Creation',
-      desc: 'Producing programming tutorials, technical articles, and developer education content to share knowledge with the community.',
-    },
-    {
-      num: '04',
-      name: 'UI/UX Design',
-      desc: 'Designing intuitive and clean user interfaces that ensure smooth and accessible user experiences.',
-    },
-    {
-      num: '05',
-      name: 'Open Source',
-      desc: 'Contributing to developer tooling, libraries, and collaborating with global creators on GitHub.',
-    },
-  ];
-
+const ServicesSection: React.FC<{ services: ServiceData[] }> = ({ services }) => {
   return (
     <section id="daksh-services" className="bg-white rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] relative z-20 px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32">
       <div className="max-w-5xl mx-auto flex flex-col items-center">
@@ -713,7 +699,7 @@ const ServicesSection: React.FC = () => {
         </FadeIn>
         <div className="w-full border-t border-[#0C0C0C]/15">
           {services.map((svc, i) => (
-            <FadeIn key={svc.num} delay={i * 0.1} y={30} className="w-full">
+            <FadeIn key={svc.num + '-' + i} delay={i * 0.1} y={30} className="w-full">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-8 sm:py-10 md:py-12 border-b border-[#0C0C0C]/15 gap-4 sm:gap-10">
                 <span className="font-black text-[#0C0C0C] text-[clamp(3rem,10vw,140px)] leading-none select-none">
                   {svc.num}
@@ -735,6 +721,146 @@ const ServicesSection: React.FC = () => {
   );
 };
 
+// 4.5 SkillsSection Component (Personalized for Daksh)
+interface SkillData {
+  name: string;
+  category: string;
+  desc: string;
+  badge: string;
+  icon: React.ComponentType<any>;
+  color: string;
+  glowColor: string;
+}
+
+const skillsList: SkillData[] = [
+  {
+    name: "AI-Assisted Engineering",
+    category: "Vibe Coding & Prompts",
+    badge: "AI-Powered",
+    desc: "Leveraging advanced language models to accelerate project prototyping, code generation, and iterative problem-solving. Maximizing development velocity through agentic workflows.",
+    icon: Sparkles,
+    color: "from-purple-500 via-pink-500 to-red-500",
+    glowColor: "rgba(236, 72, 153, 0.15)",
+  },
+  {
+    name: "Python",
+    category: "Languages",
+    badge: "Core Development",
+    desc: "Writing clean, efficient scripts for automation, data processing, and backend logic. Experienced in rapid API integrations and developing utility tools.",
+    icon: Terminal,
+    color: "from-blue-500 to-cyan-500",
+    glowColor: "rgba(6, 182, 212, 0.15)",
+  },
+  {
+    name: "C Language",
+    category: "Languages",
+    badge: "Systems & Fundamentals",
+    desc: "Understanding computer architecture, hardware-software interaction, memory management, and pointers. Solid foundation in code execution efficiency.",
+    icon: Cpu,
+    color: "from-indigo-500 to-purple-600",
+    glowColor: "rgba(99, 102, 241, 0.15)",
+  },
+  {
+    name: "C++",
+    category: "Languages",
+    badge: "Systems & OOP",
+    desc: "Implementing object-oriented design and modular components. Utilizing C++ structure for performance-driven system concepts.",
+    icon: Code,
+    color: "from-blue-600 to-indigo-600",
+    glowColor: "rgba(79, 70, 229, 0.15)",
+  },
+  {
+    name: "Java",
+    category: "Languages",
+    badge: "Object-Oriented (Foundational)",
+    desc: "A solid grasp of class structures, inheritance, polymorphism, and Java fundamentals. Building multi-platform software prototypes.",
+    icon: Coffee,
+    color: "from-orange-500 to-red-500",
+    glowColor: "rgba(249, 115, 22, 0.15)",
+  },
+  {
+    name: "HTML",
+    category: "Web Frontend",
+    badge: "Semantic Markup (Foundational)",
+    desc: "Designing the foundation of web pages with structured, accessible HTML tags. Ensuring search-engine-optimized and responsive layout outlines.",
+    icon: Layers,
+    color: "from-amber-500 to-orange-500",
+    glowColor: "rgba(245, 158, 11, 0.15)",
+  },
+];
+
+const SkillsSection: React.FC = () => {
+  return (
+    <section
+      id="daksh-skills"
+      className="bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 z-20 relative px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32"
+    >
+      <div className="max-w-5xl mx-auto flex flex-col items-center">
+        <FadeIn delay={0}>
+          <h2 className="hero-heading font-black uppercase leading-none tracking-tight text-center text-[clamp(3rem,12vw,160px)] mb-6">
+            Skills
+          </h2>
+        </FadeIn>
+        
+        <FadeIn delay={0.1}>
+          <p className="text-[#D7E2EA]/50 text-center font-light uppercase tracking-widest text-[clamp(0.7rem,1.5vw,1rem)] mb-16 max-w-lg mx-auto leading-relaxed">
+            Translating core programming logic and modern AI workflows into high-performance software
+          </p>
+        </FadeIn>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-4">
+          {skillsList.map((skill, i) => (
+            <FadeIn key={skill.name + '-' + i} delay={i * 0.1} y={35} className="h-full">
+              <motion.div
+                whileHover={{ y: -6, scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className="relative group rounded-3xl p-6 md:p-8 bg-[#141414] border border-[#D7E2EA]/10 overflow-hidden flex flex-col justify-between h-full hover:border-[#D7E2EA]/20 transition-colors duration-300"
+                style={{
+                  boxShadow: '0 10px 30px -15px rgba(0, 0, 0, 0.7)'
+                }}
+              >
+                {/* Background glow effect on hover */}
+                <div 
+                  className="absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl pointer-events-none"
+                  style={{
+                    background: `radial-gradient(400px circle at center, ${skill.glowColor}, transparent 70%)`
+                  }}
+                />
+                
+                <div className="relative z-10">
+                  {/* Header with Icon and Badge */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${skill.color} text-white shadow-lg`}>
+                      <skill.icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-[10px] font-semibold tracking-wider text-[#D7E2EA]/40 uppercase bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                      {skill.badge}
+                    </span>
+                  </div>
+
+                  {/* Skill Details */}
+                  <span className="text-[#D7E2EA]/40 text-xs uppercase tracking-widest block mb-1">
+                    {skill.category}
+                  </span>
+                  <h3 className="text-[#D7E2EA] font-bold text-xl sm:text-2xl mb-3 tracking-wide group-hover:text-white transition-colors duration-300">
+                    {skill.name}
+                  </h3>
+                  <p className="text-[#D7E2EA]/60 font-light leading-relaxed text-sm sm:text-base">
+                    {skill.desc}
+                  </p>
+                </div>
+
+                {/* Accent Footer Bar */}
+                <div className={`h-1.5 w-0 group-hover:w-full bg-gradient-to-r ${skill.color} absolute bottom-0 left-0 transition-all duration-300 rounded-b-3xl`} />
+              </motion.div>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // 5. ProjectsSection Component (Personalized for Daksh)
 const ProjectCard: React.FC<{
   index: number;
@@ -744,6 +870,7 @@ const ProjectCard: React.FC<{
   progress: any;
 }> = ({ index, project, range, targetScale, progress }) => {
   const scale = useTransform(progress, range, [1, targetScale]);
+  const hasMultipleImages = !!(project.img1 && project.img2);
 
   return (
     <div
@@ -772,68 +899,50 @@ const ProjectCard: React.FC<{
           </div>
           <LiveProjectButton href={project.link} />
         </div>
-        <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4 mt-4 md:mt-6 overflow-hidden">
-          <div className="md:col-span-2 flex flex-col gap-3 h-full overflow-hidden">
-            <img
-              src={project.img1}
-              alt="Project Image 1"
-              className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover h-[clamp(130px,16vw,230px)] shadow-lg"
-            />
-            <img
-              src={project.img2}
-              alt="Project Image 2"
-              className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover flex-1 h-[clamp(160px,22vw,340px)] shadow-lg"
-            />
-          </div>
-          <div className="md:col-span-3 h-full overflow-hidden">
-            <img
-              src={project.img3}
-              alt="Project Image 3"
-              className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover shadow-lg"
-            />
-          </div>
+        <div className="flex-1 w-full mt-4 md:mt-6 overflow-hidden">
+          {hasMultipleImages ? (
+            <div className="w-full h-full grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4">
+              <div className="md:col-span-2 flex flex-col gap-3 h-full overflow-hidden">
+                <img
+                  src={project.img1}
+                  alt="Project Image 1"
+                  className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover h-[clamp(130px,16vw,230px)] shadow-lg"
+                />
+                <img
+                  src={project.img2}
+                  alt="Project Image 2"
+                  className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover flex-1 h-[clamp(160px,22vw,340px)] shadow-lg"
+                />
+              </div>
+              <div className="md:col-span-3 h-full overflow-hidden">
+                <img
+                  src={project.img3}
+                  alt="Project Image 3"
+                  className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover shadow-lg"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="w-full h-full overflow-hidden flex items-center justify-center">
+              <img
+                src={project.img3}
+                alt="Project Screenshot"
+                className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover object-top shadow-lg"
+              />
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
   );
 };
 
-const ProjectsSection: React.FC = () => {
+const ProjectsSection: React.FC<{ projects: ProjectData[] }> = ({ projects }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
   });
-
-  const projects = [
-    {
-      num: '01',
-      category: 'AI & Tools',
-      name: 'AI Agent Platform',
-      link: 'https://github.com/sonu1612-coder',
-      img1: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055344_5eff02e0-87a5-41ce-b64f-eb08da8f33db.png&w=1280&q=85',
-      img2: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055431_11d841fd-8b41-46a5-82e4-b04f2407a7d8.png&w=1280&q=85',
-      img3: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055451_e317bf2d-28d4-48cc-86b0-6f72f25b6327.png&w=1280&q=85',
-    },
-    {
-      num: '02',
-      category: 'Education',
-      name: 'DevEdu Content Portal',
-      link: 'https://github.com/sonu1612-coder',
-      img1: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055654_911201c5-36d9-4bc6-bac7-331adfce159f.png&w=1280&q=85',
-      img2: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055723_5ceda0b8-d9c2-4665-b2e3-83ba19ba76d1.png&w=1280&q=85',
-      img3: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055753_adc5dcbd-a8e6-49c0-b43a-9b030d835cea.png&w=1280&q=85',
-    },
-    {
-      num: '03',
-      category: 'Developer Tools',
-      name: 'Get-Shit-Done CLI',
-      link: 'https://github.com/sonu1612-coder',
-      img1: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055759_963cfb0b-4bd1-4b0f-9d0a-09bd6cf95b2f.png&w=1280&q=85',
-      img2: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_060108_438f781a-9846-4dcc-89ab-c4e6cb830f5b.png&w=1280&q=85',
-      img3: 'https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055818_9d062121-ad7e-46b9-999a-1a6a692ef1ee.png&w=1280&q=85',
-    },
-  ];
 
   return (
     <section
@@ -844,7 +953,7 @@ const ProjectsSection: React.FC = () => {
       <div className="max-w-5xl mx-auto flex flex-col items-center">
         <FadeIn delay={0}>
           <h2 className="hero-heading font-black uppercase leading-none tracking-tight text-center text-[clamp(3rem,12vw,160px)] mb-16">
-            Project
+            Projects
           </h2>
         </FadeIn>
         <div className="w-full flex flex-col gap-24 relative mt-10">
@@ -853,7 +962,7 @@ const ProjectsSection: React.FC = () => {
             const range = [i * 0.25, 1] as [number, number];
             return (
               <ProjectCard
-                key={proj.name}
+                key={proj.name + '-' + i}
                 index={i}
                 project={proj}
                 range={range}
@@ -869,7 +978,7 @@ const ProjectsSection: React.FC = () => {
 };
 
 // --- DAKSH'S CONTACT & FOOTER SECTION ---
-const ContactFooterSection: React.FC = () => {
+const ContactFooterSection: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   return (
     <section
       id="daksh-contact"
@@ -886,7 +995,7 @@ const ContactFooterSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl text-left">
           <FadeIn delay={0.15} y={20}>
             <a
-              href="mailto:dakshchoudhary160@gmail.com"
+              href={`mailto:${profile.email}`}
               className="flex items-center gap-4 p-6 rounded-3xl border border-[#D7E2EA]/10 hover:border-[#D7E2EA]/30 hover:bg-white/5 transition-all duration-300"
             >
               <div className="bg-[#D7E2EA]/10 p-4 rounded-2xl text-[#D7E2EA]">
@@ -895,7 +1004,7 @@ const ContactFooterSection: React.FC = () => {
               <div className="flex flex-col">
                 <span className="text-[#D7E2EA]/40 text-xs uppercase tracking-wider">Email</span>
                 <span className="text-[#D7E2EA] font-semibold text-sm sm:text-base break-all">
-                  dakshchoudhary160@gmail.com
+                  {profile.email}
                 </span>
               </div>
             </a>
@@ -903,7 +1012,7 @@ const ContactFooterSection: React.FC = () => {
 
           <FadeIn delay={0.25} y={20}>
             <a
-              href="tel:8082327782"
+              href={`tel:${profile.phone.replace(/\s+/g, '')}`}
               className="flex items-center gap-4 p-6 rounded-3xl border border-[#D7E2EA]/10 hover:border-[#D7E2EA]/30 hover:bg-white/5 transition-all duration-300"
             >
               <div className="bg-[#D7E2EA]/10 p-4 rounded-2xl text-[#D7E2EA]">
@@ -912,7 +1021,7 @@ const ContactFooterSection: React.FC = () => {
               <div className="flex flex-col">
                 <span className="text-[#D7E2EA]/40 text-xs uppercase tracking-wider">Phone</span>
                 <span className="text-[#D7E2EA] font-semibold text-sm sm:text-base">
-                  +91 80823 27782
+                  {profile.phone}
                 </span>
               </div>
             </a>
@@ -922,10 +1031,10 @@ const ContactFooterSection: React.FC = () => {
         {/* Social Profile links */}
         <div className="flex items-center gap-4 mt-4">
           {[
-            { Icon: Github, label: 'GitHub', href: 'https://github.com/sonu1612-coder' },
-            { Icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/in/daksh-choudhary-a56a6b320/' },
-            { Icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/daksh.331/' },
-            { Icon: Twitter, label: 'Twitter', href: '#twitter' },
+            { Icon: Github, label: 'GitHub', href: profile.githubUrl },
+            { Icon: Linkedin, label: 'LinkedIn', href: profile.linkedinUrl },
+            { Icon: Instagram, label: 'Instagram', href: profile.instagramUrl },
+            { Icon: Twitter, label: 'Twitter', href: profile.twitterUrl || '#twitter' },
           ].map(({ Icon, label, href }) => (
             <a
               key={label}
@@ -943,7 +1052,7 @@ const ContactFooterSection: React.FC = () => {
         {/* Copyright */}
         <FadeIn delay={0.35} y={10}>
           <span className="text-[#D7E2EA]/30 text-xs tracking-widest uppercase">
-            © {new Date().getFullYear()} DAKSH. ALL RIGHTS RESERVED.
+            © {new Date().getFullYear()} {profile.name.toUpperCase()}. ALL RIGHTS RESERVED.
           </span>
         </FadeIn>
       </div>
@@ -951,21 +1060,123 @@ const ContactFooterSection: React.FC = () => {
   );
 };
 
+// --- DEFAULT FALLBACK DATA ---
+const defaultProfile: ProfileData = {
+  name: 'Daksh',
+  heroTitle: 'Built for the curious',
+  heroDescription: 'a developer & content creator driven by crafting modern web solutions and passionate about AI',
+  aboutText: "With more than five years of experience in development and content creation, i focus on web applications, AI integration, and sharing coding tutorials. I truly enjoy building systems that leverage artificial intelligence to solve real-world problems. Let's create something incredible together!",
+  email: 'dakshchoudhary160@gmail.com',
+  phone: '+91 80823 27782',
+  profilePicture: profilePic,
+  githubUrl: 'https://github.com/sonu1612-coder',
+  linkedinUrl: 'https://www.linkedin.com/in/daksh-choudhary-a56a6b320/',
+  instagramUrl: 'https://www.instagram.com/daksh.331/',
+  twitterUrl: '#twitter',
+};
+
+const defaultServices: ServiceData[] = [
+  {
+    num: '01',
+    name: 'Web Development',
+    desc: 'Building responsive, modern, and high-performance web applications using React, TypeScript, and Tailwind CSS.',
+  },
+  {
+    num: '02',
+    name: 'AI Integration',
+    desc: 'Leveraging large language models and AI APIs to build intelligent agents, chatbots, and automation workflows.',
+  },
+  {
+    num: '03',
+    name: 'Content Creation',
+    desc: 'Producing programming tutorials, technical articles, and developer education content to share knowledge with the community.',
+  },
+  {
+    num: '04',
+    name: 'UI/UX Design',
+    desc: 'Designing intuitive and clean user interfaces that ensure smooth and accessible user experiences.',
+  },
+  {
+    num: '05',
+    name: 'Open Source',
+    desc: 'Contributing to developer tooling, libraries, and collaborating with global creators on GitHub.',
+  },
+];
+
+const defaultProjects: ProjectData[] = [
+  {
+    num: '01',
+    category: 'Computer Vision & AI',
+    name: 'Face & Emotion Detection',
+    link: 'https://github.com/sonu1612-coder',
+    img1: '',
+    img2: '',
+    img3: faceEmotionPic,
+  },
+  {
+    num: '02',
+    category: 'Sustainability & Analytics',
+    name: 'Carbon Footprint Calculator',
+    link: 'https://github.com/sonu1612-coder',
+    img1: '',
+    img2: '',
+    img3: carbonFootprintPic,
+  },
+];
+
 // --- MAIN APP ---
 function App() {
+  const [profile, setProfile] = useState<ProfileData>(defaultProfile);
+  const [services, setServices] = useState<ServiceData[]>(defaultServices);
+  const [projects, setProjects] = useState<ProjectData[]>(defaultProjects);
+
   useEffect(() => {
-    document.title = 'Daksh -- Developer & Content Creator';
+    document.title = `${profile.name} -- Developer & Content Creator`;
+  }, [profile.name]);
+
+  useEffect(() => {
+    const fetchCMSData = async () => {
+      const cmsProfile = await getProfile();
+      if (cmsProfile) {
+        setProfile((prev) => ({
+          ...prev,
+          ...cmsProfile,
+          profilePicture: cmsProfile.profilePicture || prev.profilePicture,
+        }));
+      }
+
+      const cmsServices = await getServices();
+      if (cmsServices && cmsServices.length > 0) {
+        setServices(cmsServices);
+      }
+
+      const cmsProjects = await getProjects();
+      if (cmsProjects && cmsProjects.length > 0) {
+        const filteredCMS = cmsProjects.filter(
+          (p) =>
+            !p.name.includes("AI Agent") &&
+            !p.name.includes("DevEdu") &&
+            !p.name.includes("CLI")
+        );
+        setProjects([...defaultProjects, ...filteredCMS]);
+      } else {
+        setProjects(defaultProjects);
+      }
+    };
+
+    fetchCMSData();
   }, []);
 
   return (
     <div style={{ overflowX: 'clip' }} className="w-full bg-[#0C0C0C] relative">
-      <CinematicHero />
-      <DakshHero />
+      <CinematicHero profile={profile} />
+      <DakshHero profile={profile} />
       <MarqueeSection />
-      <AboutSection />
-      <ServicesSection />
-      <ProjectsSection />
-      <ContactFooterSection />
+      <AboutSection profile={profile} />
+      <ServicesSection services={services} />
+      <SkillsSection />
+      <ProjectsSection projects={projects} />
+      <ContactFooterSection profile={profile} />
     </div>
   );
 }
