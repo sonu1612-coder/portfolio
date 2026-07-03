@@ -1,6 +1,6 @@
 import { createClient } from '@sanity/client';
 
-const projectId = import.meta.env.VITE_SANITY_PROJECT_ID || 'your_project_id';
+const projectId = import.meta.env.VITE_SANITY_PROJECT_ID || 'r89xbg9r';
 const dataset = import.meta.env.VITE_SANITY_DATASET || 'production';
 
 export const client = createClient({

@@ -392,10 +392,10 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
               <span>{profile.name}</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
-              {['Features', 'Pricing', 'About'].map((link) => (
+              {['About'].map((link) => (
                 <a
                   key={link}
-                  href={`#${link.toLowerCase()}`}
+                  href={`#daksh-${link.toLowerCase()}`}
                   className="text-white/80 hover:text-white transition-colors text-sm font-medium"
                 >
                   {link}
@@ -438,24 +438,7 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
         >
           {profile.heroTitle}
         </h1>
-        <div className="max-w-xl w-full space-y-4 flex flex-col items-center">
-          <div className="liquid-glass rounded-full pl-6 pr-2 py-2 flex items-center gap-3 w-full">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="bg-transparent border-none outline-none flex-1 text-white placeholder:text-white/40 text-base"
-            />
-            <button className="bg-white rounded-full p-3 text-black hover:bg-white/90 transition-colors flex items-center justify-center cursor-pointer shrink-0">
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
-          <p className="text-white/60 text-sm leading-relaxed px-4">
-            Stay updated with the latest news and insights. Subscribe to our newsletter today and never miss out on exciting updates.
-          </p>
-          <button className="liquid-glass rounded-full px-8 py-3 text-white text-sm font-medium hover:bg-white/5 transition-colors mt-2">
-            Manifesto
-          </button>
-        </div>
+
       </main>
       <footer className="relative z-10 flex justify-center gap-4 pb-12 w-full">
         {[
