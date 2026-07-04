@@ -376,7 +376,7 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover translate-y-[17%] pointer-events-none contrast-[1.15] saturate-[1.2] brightness-[1.05]"
-        src="/my_video.mp4"
+        src="/new_video.mp4"
         autoPlay
         muted
         playsInline
