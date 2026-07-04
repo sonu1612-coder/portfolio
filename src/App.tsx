@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Globe, ArrowRight, Mail, Phone, Sparkles, Terminal, Cpu, Code, Coffee, Layers } from 'lucide-react';
+import { Globe, Mail, Phone, Sparkles, Terminal, Cpu, Code, Coffee, Layers } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import profilePic from './assets/profile.png';
 import faceEmotionPic from './assets/face_emotion_detection.png';
