@@ -332,6 +332,11 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
     fadingOutRef.current = true;
     video.pause();
     video.style.opacity = '0';
+
+    window.scrollTo({
+      top: window.innerHeight,
+      behavior: 'smooth',
+    });
   };
 
   const handlePlay = () => {
