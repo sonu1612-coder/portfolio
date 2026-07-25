@@ -328,23 +328,10 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   const handleEnded = () => {
     const video = videoRef.current;
     if (!video) return;
-    
-    // Swipe down transition (scroll to next section smoothly)
-    window.scrollTo({
-      top: window.innerHeight,
-      behavior: 'smooth'
-    });
 
+    fadingOutRef.current = true;
+    video.pause();
     video.style.opacity = '0';
-    setTimeout(() => {
-      video.currentTime = 0;
-      video.play()
-        .then(() => {
-          fadingOutRef.current = false;
-          startFade(1, 500);
-        })
-        .catch((err) => console.log('Video error:', err));
-    }, 1000);
   };
 
   const handlePlay = () => {
@@ -371,6 +358,8 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
     };
   }, []);
 
+  const heroTitle = profile.heroTitle?.trim() && profile.heroTitle !== 'Built for the curious' ? profile.heroTitle : '';
+
   return (
     <div className="relative min-h-screen bg-black overflow-hidden flex flex-col justify-between select-none">
       <video
@@ -380,6 +369,7 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
         autoPlay
         muted
         playsInline
+        loop={false}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         onPlay={handlePlay}
@@ -432,12 +422,14 @@ const CinematicHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
             className="relative w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border border-white/20 shadow-2xl transition-transform duration-300 group-hover:scale-105"
           />
         </div>
-        <h1
-          style={{ fontFamily: "'Instrument Serif', serif" }}
-          className="text-5xl md:text-6xl lg:text-7xl text-white mb-8 tracking-tight whitespace-nowrap"
-        >
-          {profile.heroTitle}
-        </h1>
+        {heroTitle && (
+          <h1
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+            className="text-5xl md:text-6xl lg:text-7xl text-white mb-8 tracking-tight whitespace-nowrap"
+          >
+            {heroTitle}
+          </h1>
+        )}
 
       </main>
       <footer className="relative z-10 flex justify-center gap-4 pb-12 w-full">
@@ -1050,7 +1042,7 @@ const ContactFooterSection: React.FC<{ profile: ProfileData }> = ({ profile }) =
 // --- DEFAULT FALLBACK DATA ---
 const defaultProfile: ProfileData = {
   name: 'Daksh',
-  heroTitle: 'Built for the curious',
+  heroTitle: '',
   heroDescription: 'a developer & content creator driven by crafting modern web solutions and passionate about AI',
   aboutText: "With more than five years of experience in development and content creation, i focus on web applications, AI integration, and sharing coding tutorials. I truly enjoy building systems that leverage artificial intelligence to solve real-world problems. Let's create something incredible together!",
   email: 'dakshchoudhary160@gmail.com',
