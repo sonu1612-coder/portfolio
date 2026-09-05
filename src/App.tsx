@@ -510,32 +510,8 @@ const DakshHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
 const FeaturedVideoSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isInView, setIsInView] = useState(false);
 
-  // Toggle play/pause only via user interaction
-  const togglePlay = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (video.paused) {
-      video.play().then(() => setIsPlaying(true)).catch((err) => console.log('Play error:', err));
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const toggleSound = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!videoRef.current) return;
-    const next = !isMuted;
-    videoRef.current.muted = next;
-    setIsMuted(next);
-  };
-
-  // Observe visibility: if user scrolls away, strictly pause the video and audio
+  // Auto-play when scrolled into view, pause when scrolled away
   useEffect(() => {
     const target = containerRef.current;
     if (!target) return;
@@ -543,15 +519,11 @@ const FeaturedVideoSection: React.FC = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          if (!videoRef.current) return;
           if (entry.isIntersecting) {
-            setIsInView(true);
+            videoRef.current.play().catch(() => {});
           } else {
-            setIsInView(false);
-            // Immediately pause if user scrolls away
-            if (videoRef.current && !videoRef.current.paused) {
-              videoRef.current.pause();
-              setIsPlaying(false);
-            }
+            videoRef.current.pause();
           }
         });
       },
@@ -572,38 +544,19 @@ const FeaturedVideoSection: React.FC = () => {
       <div className="w-full">
         <FadeIn delay={0.2} y={20} className="w-full">
           <div
-            onClick={togglePlay}
-            className="w-full relative overflow-hidden featured-video-wrap cursor-pointer group"
+            className="w-full relative overflow-hidden featured-video-wrap"
             style={{ borderRadius: '18px', boxShadow: '0 0 60px rgba(182,0,168,0.22)', background: '#000' }}
           >
             <video
               ref={videoRef}
               src="/python_4k.mp4"
-              className="w-full h-auto aspect-video object-cover block select-none"
+              className="w-full h-auto aspect-video object-cover block pointer-events-none select-none"
+              autoPlay
               loop
-              muted={isMuted}
+              muted
               playsInline
-              preload="metadata"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
               style={{ borderRadius: '18px' }}
             />
-
-            {/* Big Centered Play / Pause Button Overlay when in view */}
-            {(!isPlaying || !isInView) && (
-              <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all duration-300">
-                <button
-                  type="button"
-                  onClick={togglePlay}
-                  aria-label="Play video"
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full liquid-glass flex items-center justify-center text-white border border-white/20 shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 bg-white/10"
-                >
-                  <svg className="w-9 h-9 sm:w-11 sm:h-11 translate-x-0.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                </button>
-              </div>
-            )}
 
             {/* Top fade — softly dissolves the top edge of the video box into the page background */}
             <div
@@ -624,65 +577,6 @@ const FeaturedVideoSection: React.FC = () => {
             {/* Full corner cover — hides Chrome's Gemini AI sparkle and any injected media overlay */}
             <div className="absolute bottom-0 right-0 w-24 h-24 bg-black z-30 pointer-events-none" />
             <div className="absolute top-0 right-0 w-24 h-10 bg-black z-30 pointer-events-none" />
-
-            {/* Controls Bar (Sound & Play indicator) */}
-            <div className="absolute bottom-3 left-4 z-40 flex items-center gap-3">
-              {/* Play / Pause Toggle Button */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePlay();
-                }}
-                aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                className="liquid-glass rounded-full px-3.5 py-2 text-white/90 hover:text-white text-xs font-medium uppercase tracking-widest transition-all backdrop-blur-md shadow-lg flex items-center gap-2 cursor-pointer select-none"
-              >
-                {isPlaying ? (
-                  <>
-                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="6" y="4" width="4" height="16" />
-                      <rect x="14" y="4" width="4" height="16" />
-                    </svg>
-                    <span>Pause</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                    <span>Play</span>
-                  </>
-                )}
-              </button>
-
-              {/* Sound toggle button */}
-              <button
-                type="button"
-                onClick={toggleSound}
-                aria-label={isMuted ? 'Enable sound' : 'Mute sound'}
-                className="liquid-glass rounded-full px-3.5 py-2 text-white/90 hover:text-white text-xs font-medium uppercase tracking-widest transition-all backdrop-blur-md shadow-lg flex items-center gap-2 cursor-pointer select-none"
-              >
-                {isMuted ? (
-                  <>
-                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                      <line x1="23" y1="9" x2="17" y2="15" />
-                      <line x1="17" y1="9" x2="23" y2="15" />
-                    </svg>
-                    <span>Unmute</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                    </svg>
-                    <span>Mute</span>
-                  </>
-                )}
-              </button>
-            </div>
           </div>
         </FadeIn>
       </div>
