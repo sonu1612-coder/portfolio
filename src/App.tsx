@@ -571,11 +571,7 @@ const FeaturedVideoSection: React.FC = () => {
         <FadeIn delay={0.2} y={20} className="w-full">
           <div
             className="w-full relative overflow-hidden featured-video-wrap"
-            style={{
-              borderRadius: '18px',
-              boxShadow: '0 0 70px rgba(182, 0, 168, 0.35)',
-              background: '#0C0C0C',
-            }}
+            style={{ borderRadius: '18px', boxShadow: '0 0 60px rgba(182,0,168,0.22)', background: '#000' }}
           >
             <video
               ref={videoRef}
@@ -584,27 +580,23 @@ const FeaturedVideoSection: React.FC = () => {
               autoPlay
               loop
               playsInline
-              style={{
-                borderRadius: '18px',
-                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
-                maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
-              }}
+              style={{ borderRadius: '18px' }}
             />
 
-            {/* Top fade & blur — dissolves top video border into background with subtle pink tint */}
+            {/* Top fade — softly dissolves the top edge of the video box into the page background */}
             <div
-              className="absolute top-0 left-0 w-full z-20 pointer-events-none backdrop-blur-[4px]"
+              className="absolute top-0 left-0 w-full z-20 pointer-events-none"
               style={{
-                height: '130px',
-                background: 'linear-gradient(to bottom, #0C0C0C 0%, rgba(182, 0, 168, 0.15) 35%, rgba(12,12,12,0) 100%)',
+                height: '110px',
+                background: 'linear-gradient(to bottom, #0C0C0C 0%, rgba(12,12,12,0.7) 45%, rgba(12,12,12,0) 100%)',
               }}
             />
-            {/* Bottom fade & blur — dissolves bottom video border into background with subtle pink tint */}
+            {/* Bottom fade — softly dissolves the bottom edge of the video box into the page background */}
             <div
-              className="absolute bottom-0 left-0 w-full z-20 pointer-events-none backdrop-blur-[4px]"
+              className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
               style={{
-                height: '130px',
-                background: 'linear-gradient(to top, #0C0C0C 0%, rgba(182, 0, 168, 0.15) 35%, rgba(12,12,12,0) 100%)',
+                height: '110px',
+                background: 'linear-gradient(to top, #0C0C0C 0%, rgba(12,12,12,0.7) 45%, rgba(12,12,12,0) 100%)',
               }}
             />
           </div>
