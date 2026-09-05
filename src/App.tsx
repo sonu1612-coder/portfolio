@@ -511,19 +511,43 @@ const FeaturedVideoSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Auto-play when scrolled into view, pause when scrolled away
+  // Auto-play with sound when scrolled into view, pause when scrolled away
   useEffect(() => {
     const target = containerRef.current;
     if (!target) return;
 
+    const playVideo = () => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      video.muted = false;
+      video.play().catch(() => {
+        // Fallback to muted autoplay if browser blocks unmuted play prior to user interaction
+        video.muted = true;
+        video.play().catch(() => {});
+      });
+    };
+
+    // Unmute on user interaction anywhere on page if autoplay policy initially blocked sound
+    const handleUserInteraction = () => {
+      const video = videoRef.current;
+      if (video && !video.paused) {
+        video.muted = false;
+      }
+    };
+
+    window.addEventListener('click', handleUserInteraction);
+    window.addEventListener('touchstart', handleUserInteraction);
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!videoRef.current) return;
+          const video = videoRef.current;
+          if (!video) return;
           if (entry.isIntersecting) {
-            videoRef.current.play().catch(() => {});
+            playVideo();
           } else {
-            videoRef.current.pause();
+            video.pause();
           }
         });
       },
@@ -536,6 +560,8 @@ const FeaturedVideoSection: React.FC = () => {
 
     return () => {
       observer.disconnect();
+      window.removeEventListener('click', handleUserInteraction);
+      window.removeEventListener('touchstart', handleUserInteraction);
     };
   }, []);
 
@@ -553,7 +579,6 @@ const FeaturedVideoSection: React.FC = () => {
               className="w-full h-auto aspect-video object-cover block pointer-events-none select-none"
               autoPlay
               loop
-              muted
               playsInline
               style={{ borderRadius: '18px' }}
             />
