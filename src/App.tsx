@@ -599,9 +599,6 @@ const FeaturedVideoSection: React.FC = () => {
                 background: 'linear-gradient(to top, #0C0C0C 0%, rgba(12,12,12,0.7) 45%, rgba(12,12,12,0) 100%)',
               }}
             />
-            {/* Full corner cover — hides Chrome's Gemini AI sparkle and any injected media overlay */}
-            <div className="absolute bottom-0 right-0 w-24 h-24 bg-black z-30 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-24 h-10 bg-black z-30 pointer-events-none" />
           </div>
         </FadeIn>
       </div>
