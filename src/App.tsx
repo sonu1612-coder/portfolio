@@ -508,6 +508,7 @@ const DakshHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
 
 // 2. FeaturedVideoSection Component (Showcasing python.mp4 full width below Contact Me button)
 const FeaturedVideoSection: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
 
@@ -519,8 +520,43 @@ const FeaturedVideoSection: React.FC = () => {
     setIsMuted(next);
   };
 
+  // Only play video (and sound if enabled) when user can see it on display
+  useEffect(() => {
+    const video = videoRef.current;
+    const target = containerRef.current || video;
+    if (!video || !target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // User can see the video on display -> play
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+              playPromise.catch((err) => {
+                console.log('Video play deferred or blocked:', err);
+              });
+            }
+          } else {
+            // Video is out of view -> pause
+            video.pause();
+          }
+        });
+      },
+      {
+        threshold: 0.25, // At least 25% of the video must be visible
+      }
+    );
+
+    observer.observe(target);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
-    <section className="w-full bg-[#0C0C0C] pt-6 sm:pt-10 md:pt-14 pb-14 sm:pb-20 md:pb-24 px-0 relative z-10 overflow-hidden flex flex-col items-center">
+    <section ref={containerRef} className="w-full bg-[#0C0C0C] pt-6 sm:pt-10 md:pt-14 pb-14 sm:pb-20 md:pb-24 px-0 relative z-10 overflow-hidden flex flex-col items-center">
       <div className="w-full">
         <FadeIn delay={0.2} y={20} className="w-full">
           <div className="w-full relative overflow-hidden featured-video-wrap" style={{borderRadius:'18px', boxShadow:'0 0 60px rgba(182,0,168,0.22)', background:'#000'}}>
@@ -528,7 +564,6 @@ const FeaturedVideoSection: React.FC = () => {
               ref={videoRef}
               src="/python_4k.mp4"
               className="w-full h-auto aspect-video object-cover block pointer-events-none select-none"
-              autoPlay
               loop
               muted={isMuted}
               playsInline
