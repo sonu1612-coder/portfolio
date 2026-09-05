@@ -50,3 +50,24 @@ body,
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* ─── Suppress Chrome's Gemini AI sparkle & injected media overlays on video ─── */
+.featured-video-wrap video::-webkit-media-controls,
+.featured-video-wrap video::-webkit-media-controls-enclosure,
+.featured-video-wrap video::-webkit-media-controls-panel,
+.featured-video-wrap video::-webkit-media-controls-overlay-play-button,
+.featured-video-wrap video::-webkit-media-text-track-container {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* High-quality GPU-accelerated rendering for the video */
+.featured-video-wrap video {
+  image-rendering: high-quality;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}

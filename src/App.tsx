@@ -2,15 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Globe, Mail, Phone, Sparkles, Terminal, Cpu, Code, Coffee, Layers } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import profilePic from './assets/profile.png';
-import faceEmotionPic from './assets/face_emotion_detection.png';
-import carbonFootprintPic from './assets/carbon_footprint.png';
 import {
   getProfile,
   getServices,
-  getProjects,
   type ProfileData,
   type ServiceData,
-  type ProjectData,
 } from './sanity';
 
 // --- INLINE SVGS FOR BRAND ICONS (Lucide v1.x fallback) ---
@@ -92,19 +88,7 @@ const ContactButton: React.FC<{ email?: string }> = ({ email = 'dakshchoudhary16
   </a>
 );
 
-// 2. LiveProjectButton Component
-const LiveProjectButton: React.FC<{ href?: string }> = ({ href = '#' }) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-3.5 text-sm sm:text-base hover:bg-[#D7E2EA]/10 cursor-pointer transition-colors duration-200 inline-block text-center"
-  >
-    Live Project
-  </a>
-);
-
-// 3. FadeIn Component using motion.create()
+// 2. FadeIn Component using motion.create()
 interface FadeInProps {
   children: React.ReactNode;
   delay?: number;
@@ -522,96 +506,82 @@ const DakshHero: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   );
 };
 
-// 2. MarqueeSection Component
-const MarqueeSection: React.FC = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [offset, setOffset] = useState(0);
+// 2. FeaturedVideoSection Component (Showcasing python.mp4 full width below Contact Me button)
+const FeaturedVideoSection: React.FC = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const sectionTop = window.scrollY + rect.top;
-      const currentOffset = (window.scrollY - sectionTop + window.innerHeight) * 0.3;
-      setOffset(currentOffset);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  const row1Images = [
-    'https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif',
-    'https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif',
-    'https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif',
-    'https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif',
-    'https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif',
-    'https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif',
-    'https://motionsites.ai/assets/hero-vitara-preview-Cjz2QYyU.gif',
-    'https://motionsites.ai/assets/hero-terra-preview-BFjrCr7T.gif',
-    'https://motionsites.ai/assets/hero-skyelite-preview-DHaZIgUv.gif',
-    'https://motionsites.ai/assets/hero-aethera-preview-DknSlcTa.gif',
-    'https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif',
-  ];
-
-  const row2Images = [
-    'https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif',
-    'https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif',
-    'https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif',
-    'https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif',
-    'https://motionsites.ai/assets/hero-evr-ventures-preview-DZxeVFEX.gif',
-    'https://motionsites.ai/assets/hero-planet-orbit-preview-DWAP8Z1P.gif',
-    'https://motionsites.ai/assets/hero-new-era-preview-CocuDUm9.gif',
-    'https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif',
-    'https://motionsites.ai/assets/hero-luminex-preview-CxOP7ce6.gif',
-    'https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif',
-  ];
-
-  const tripledRow1 = [...row1Images, ...row1Images, ...row1Images];
-  const tripledRow2 = [...row2Images, ...row2Images, ...row2Images];
+  // Autoplay requires muted. Once user clicks the sound button, unmute.
+  const toggleSound = () => {
+    if (!videoRef.current) return;
+    const next = !isMuted;
+    videoRef.current.muted = next;
+    setIsMuted(next);
+  };
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-[#0C0C0C] pt-24 sm:pt-32 md:pt-40 pb-10 overflow-hidden flex flex-col gap-3 relative z-10"
-    >
-      <div
-        className="flex gap-3 whitespace-nowrap"
-        style={{
-          transform: `translateX(${offset - 200}px)`,
-          willChange: 'transform',
-        }}
-      >
-        {tripledRow1.map((url, i) => (
-          <img
-            key={`row1-${i}`}
-            src={url}
-            alt="Marquee Item"
-            className="w-[420px] h-[270px] rounded-2xl object-cover shrink-0 select-none pointer-events-none"
-            loading="lazy"
-          />
-        ))}
-      </div>
-      <div
-        className="flex gap-3 whitespace-nowrap"
-        style={{
-          transform: `translateX(${-(offset - 200)}px)`,
-          willChange: 'transform',
-        }}
-      >
-        {tripledRow2.map((url, i) => (
-          <img
-            key={`row2-${i}`}
-            src={url}
-            alt="Marquee Item"
-            className="w-[420px] h-[270px] rounded-2xl object-cover shrink-0 select-none pointer-events-none"
-            loading="lazy"
-          />
-        ))}
+    <section className="w-full bg-[#0C0C0C] pt-6 sm:pt-10 md:pt-14 pb-14 sm:pb-20 md:pb-24 px-0 relative z-10 overflow-hidden flex flex-col items-center">
+      <div className="w-full">
+        <FadeIn delay={0.2} y={20} className="w-full">
+          <div className="w-full relative overflow-hidden featured-video-wrap" style={{borderRadius:'18px', boxShadow:'0 0 60px rgba(182,0,168,0.22)', background:'#000'}}>
+            <video
+              ref={videoRef}
+              src="/python_4k.mp4"
+              className="w-full h-auto aspect-video object-cover block pointer-events-none select-none"
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              style={{borderRadius:'18px'}}
+            />
+            {/* Top fade — softly dissolves the top edge of the video box into the page background */}
+            <div
+              className="absolute top-0 left-0 w-full z-20 pointer-events-none"
+              style={{
+                height: '110px',
+                background: 'linear-gradient(to bottom, #0C0C0C 0%, rgba(12,12,12,0.7) 45%, rgba(12,12,12,0) 100%)',
+              }}
+            />
+            {/* Bottom fade — softly dissolves the bottom edge of the video box into the page background */}
+            <div
+              className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
+              style={{
+                height: '110px',
+                background: 'linear-gradient(to top, #0C0C0C 0%, rgba(12,12,12,0.7) 45%, rgba(12,12,12,0) 100%)',
+              }}
+            />
+            {/* Full corner cover — hides Chrome's Gemini AI sparkle and any injected media overlay */}
+            <div className="absolute bottom-0 right-0 w-24 h-24 bg-black z-30 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-24 h-10 bg-black z-30 pointer-events-none" />
+            {/* Sound toggle button — bottom left */}
+            <button
+              type="button"
+              onClick={toggleSound}
+              aria-label={isMuted ? 'Enable sound' : 'Mute sound'}
+              className="absolute bottom-3 left-4 z-40 flex items-center gap-2 liquid-glass rounded-full px-3 py-2 text-white/80 hover:text-white text-xs font-medium uppercase tracking-widest transition-all backdrop-blur-md shadow-lg cursor-pointer select-none"
+            >
+              {isMuted ? (
+                <>
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                  <span>Sound Off</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  </svg>
+                  <span>Sound On</span>
+                </>
+              )}
+            </button>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );
@@ -845,122 +815,6 @@ const SkillsSection: React.FC = () => {
   );
 };
 
-// 5. ProjectsSection Component (Personalized for Daksh)
-const ProjectCard: React.FC<{
-  index: number;
-  project: any;
-  range: [number, number];
-  targetScale: number;
-  progress: any;
-}> = ({ index, project, range, targetScale, progress }) => {
-  const scale = useTransform(progress, range, [1, targetScale]);
-  const hasMultipleImages = !!(project.img1 && project.img2);
-
-  return (
-    <div
-      className="sticky w-full h-[85vh] flex items-center justify-center top-24 md:top-32"
-      style={{
-        top: `${index * 28}px`,
-      }}
-    >
-      <motion.div
-        style={{ scale }}
-        className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] bg-[#0C0C0C] p-4 sm:p-6 md:p-8 flex flex-col justify-between overflow-hidden shadow-2xl"
-      >
-        <div className="flex items-center justify-between w-full border-b border-[#D7E2EA]/10 pb-4 md:pb-6 gap-4">
-          <div className="flex items-center gap-4 md:gap-8">
-            <span className="font-black text-[#D7E2EA] text-3xl sm:text-4xl md:text-5xl leading-none">
-              {project.num}
-            </span>
-            <div className="flex flex-col">
-              <span className="text-[#D7E2EA]/50 uppercase tracking-widest text-[10px] sm:text-xs">
-                {project.category}
-              </span>
-              <h3 className="text-[#D7E2EA] uppercase font-bold text-sm sm:text-lg md:text-2xl tracking-wide">
-                {project.name}
-              </h3>
-            </div>
-          </div>
-          <LiveProjectButton href={project.link} />
-        </div>
-        <div className="flex-1 w-full mt-4 md:mt-6 overflow-hidden">
-          {hasMultipleImages ? (
-            <div className="w-full h-full grid grid-cols-1 md:grid-cols-5 gap-3 md:gap-4">
-              <div className="md:col-span-2 flex flex-col gap-3 h-full overflow-hidden">
-                <img
-                  src={project.img1}
-                  alt="Project Image 1"
-                  className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover h-[clamp(130px,16vw,230px)] shadow-lg"
-                />
-                <img
-                  src={project.img2}
-                  alt="Project Image 2"
-                  className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover flex-1 h-[clamp(160px,22vw,340px)] shadow-lg"
-                />
-              </div>
-              <div className="md:col-span-3 h-full overflow-hidden">
-                <img
-                  src={project.img3}
-                  alt="Project Image 3"
-                  className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover shadow-lg"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="w-full h-full overflow-hidden flex items-center justify-center">
-              <img
-                src={project.img3}
-                alt="Project Screenshot"
-                className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover object-top shadow-lg"
-              />
-            </div>
-          )}
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-const ProjectsSection: React.FC<{ projects: ProjectData[] }> = ({ projects }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  });
-
-  return (
-    <section
-      ref={containerRef}
-      id="daksh-projects"
-      className="bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 z-20 relative px-5 sm:px-8 md:px-10 py-20 pb-20"
-    >
-      <div className="max-w-5xl mx-auto flex flex-col items-center">
-        <FadeIn delay={0}>
-          <h2 className="hero-heading font-black uppercase leading-none tracking-tight text-center text-[clamp(3rem,12vw,160px)] mb-16">
-            Projects
-          </h2>
-        </FadeIn>
-        <div className="w-full flex flex-col gap-24 relative mt-10">
-          {projects.map((proj, i) => {
-            const targetScale = 1 - (projects.length - 1 - i) * 0.03;
-            const range = [i * 0.25, 1] as [number, number];
-            return (
-              <ProjectCard
-                key={proj.name + '-' + i}
-                index={i}
-                project={proj}
-                range={range}
-                targetScale={targetScale}
-                progress={scrollYProgress}
-              />
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-};
-
 // --- DAKSH'S CONTACT & FOOTER SECTION ---
 const ContactFooterSection: React.FC<{ profile: ProfileData }> = ({ profile }) => {
   return (
@@ -1087,32 +941,10 @@ const defaultServices: ServiceData[] = [
   },
 ];
 
-const defaultProjects: ProjectData[] = [
-  {
-    num: '01',
-    category: 'Computer Vision & AI',
-    name: 'Face & Emotion Detection',
-    link: 'https://github.com/sonu1612-coder',
-    img1: '',
-    img2: '',
-    img3: faceEmotionPic,
-  },
-  {
-    num: '02',
-    category: 'Sustainability & Analytics',
-    name: 'Carbon Footprint Calculator',
-    link: 'https://github.com/sonu1612-coder',
-    img1: '',
-    img2: '',
-    img3: carbonFootprintPic,
-  },
-];
-
 // --- MAIN APP ---
 function App() {
   const [profile, setProfile] = useState<ProfileData>(defaultProfile);
   const [services, setServices] = useState<ServiceData[]>(defaultServices);
-  const [projects, setProjects] = useState<ProjectData[]>(defaultProjects);
 
   useEffect(() => {
     document.title = `${profile.name} -- Developer & Content Creator`;
@@ -1134,18 +966,6 @@ function App() {
         setServices(cmsServices);
       }
 
-      const cmsProjects = await getProjects();
-      if (cmsProjects && cmsProjects.length > 0) {
-        const filteredCMS = cmsProjects.filter(
-          (p) =>
-            !p.name.includes("AI Agent") &&
-            !p.name.includes("DevEdu") &&
-            !p.name.includes("CLI")
-        );
-        setProjects([...defaultProjects, ...filteredCMS]);
-      } else {
-        setProjects(defaultProjects);
-      }
     };
 
     fetchCMSData();
@@ -1155,11 +975,10 @@ function App() {
     <div style={{ overflowX: 'clip' }} className="w-full bg-[#0C0C0C] relative">
       <CinematicHero profile={profile} />
       <DakshHero profile={profile} />
-      <MarqueeSection />
+      <FeaturedVideoSection />
       <AboutSection profile={profile} />
       <ServicesSection services={services} />
       <SkillsSection />
-      <ProjectsSection projects={projects} />
       <ContactFooterSection profile={profile} />
     </div>
   );
